@@ -518,7 +518,8 @@ def get_query_data_loaders(
     validation: Iterable[Sample],
     test: Iterable[Sample],
     add_relation_inverses: bool = False,
-    batch_size: int = 16,
+    train_batch_size: int = 16,
+    eval_batch_size: int = 16,
     num_workers: int = 0,
 ) -> Tuple[Mapping[str, DataLoader[QueryGraphBatch]], Information]:
     """
@@ -539,7 +540,7 @@ def get_query_data_loaders(
     loaders: Mapping[str, DataLoader[QueryGraphBatch]] = {
         split_name: cast(DataLoader[QueryGraphBatch], DataLoader(  # we need to cast because torch typing does not propagate the output type of the collate function
             dataset=data_split,
-            batch_size=batch_size,
+            batch_size=train_batch_size if split_name == 'train' else eval_batch_size,
             shuffle=split_name == "train",
             collate_fn=collate_query_data(dataset, add_relation_inverses),
             pin_memory=True,
